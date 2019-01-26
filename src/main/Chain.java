@@ -8,12 +8,31 @@ public class Chain {
 
 	
 	public static ArrayList<Block> blockchain = new ArrayList<Block>();
+	public static int difficulty = 5;
+	
 	
 	public static void main(String[] args) {
 		
 		blockchain.add(new Block("I am the alpha block", "0"));
+		System.out.println("Trying to mine block 1...");
+		blockchain.get(0).mineBlock(difficulty);
+		
+		System.out.println("Trying to Mine block 2... ");
 		blockchain.add(new Block("I am the second block", blockchain.get(blockchain.size()-1).hash));
+		blockchain.get(1).mineBlock(difficulty);
+		
+		System.out.println("Trying to Mine block 3... ");
 		blockchain.add(new Block("I am the third block", blockchain.get(blockchain.size()-1).hash));
+		blockchain.get(2).mineBlock(difficulty);
+		
+		System.out.println("Blockchain is Valid: " + isChainValid());
+		
+		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+		System.out.println("\nThe blockchain is valid: " + isChainValid());
+		System.out.println(blockchainJson);
+		
+		//blockchain.add(new Block("I am the third block", blockchain.get(blockchain.size()-1).hash));
+		
 		
 		
 		/*
@@ -27,9 +46,6 @@ public class Chain {
 		System.out.println("Hash for 3rd block: " + thirdBlock.hash);
 		*/
 		
-		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-		System.out.println(blockchainJson);
-		
 	}
 	
 	public static Boolean isChainValid() {
@@ -37,7 +53,7 @@ public class Chain {
 		Block cBlock;
 		Block pBlock;
 		
-		for (int i = 0; i < blockchain.size(); i++) {
+		for (int i = 1; i < blockchain.size(); i++) {
 			
 			cBlock = blockchain.get(i);
 			pBlock = blockchain.get(i - 1);
