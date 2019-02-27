@@ -4,81 +4,73 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import util.ArrayUtil;
-import album.PhotoTransaction;
-import album.PhotoIn;
-import album.PhotoOut;
-import album.Album;
+import wallet.LogTransaction;
+import wallet.LogTransactionInput;
+import wallet.LogTransactionOutput;
+import wallet.LogWallet;
 
-public class AlbumChain {
-
-	public static ArrayList<PhotoBlock> blockchain = new ArrayList<PhotoBlock>();
-	public static HashMap<String, PhotoOut> UTXOs = new HashMap<String, PhotoOut>();
+public class LogChain {
+	
+	public static ArrayList<LogBlock> blockchain = new ArrayList<LogBlock>();
+	public static HashMap<String, LogTransactionOutput> UTXOs = new HashMap<String, LogTransactionOutput>();
 	
 	public static int difficulty = 3;
 	public static float minimumTransaction = 0.1f;
-	public static Album albumA;
-	public static Album albumB;
-	public static PhotoTransaction genesisTransaction;
-	
+	public static LogWallet walletA;
+	public static LogWallet walletB;
+	public static LogTransaction genesisTransaction;
 	
 	public static void main(String[] args) {
 		
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 		
-		albumA = new Album();
-		albumA = new Album();
+		walletA = new LogWallet();
+		walletB = new LogWallet();
 		
-//		System.out.println("Private and public keys:");
-//		System.out.println(StringUtil.getStringFromKey(walletA.privateKey));
-//		System.out.println(StringUtil.getStringFromKey(walletA.publicKey));
-//		
-//		Transaction transaction = new Transaction(walletA.publicKey, walletB.publicKey, 5, null);
-//		transaction.generateSignature(walletA.privateKey);
-//		
-//		System.out.println("Is signature verified");
-//		System.out.println(transaction.verifySignature());
+		//System.out.println("Private and public keys:");
+		//System.out.println(StringUtil.getStringFromKey(walletA.privateKey));
+		//System.out.println(StringUtil.getStringFromKey(walletA.publicKey));
+		//Transaction transaction = new Transaction(walletA.publicKey, walletB.publicKey, 5, null);
+		//transaction.generateSignature(walletA.privateKey);
+		//System.out.println("Is signature verified");
+		//System.out.println(transaction.verifySignature());
 	
-		Album photoBase = new Album();
+		LogWallet logbase = new LogWallet();
 		
-		genesisTransaction = new PhotoTransaction(photoBase.publicKey, albumA.publicKey, ArrayUtil.populateArray(""), null);
-		genesisTransaction.generateSignature(photoBase.privateKey);
+		genesisTransaction = new LogTransaction(logbase.publicKey, walletA.publicKey, 100f, null);
+		genesisTransaction.generateSignature(logbase.privateKey);
 		genesisTransaction.transactionId = "0";
-		genesisTransaction.outputs.add(new PhotoOut(genesisTransaction.recipient, genesisTransaction.value, genesisTransaction.transactionId));
+		genesisTransaction.outputs.add(new LogTransactionOutput(genesisTransaction.recipient, genesisTransaction.value, genesisTransaction.files, genesisTransaction.transactionId));
 		UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
 		
 		System.out.println("Creating and mining genesis block... ");
-		PhotoBlock genesis = new PhotoBlock("0");
+		LogBlock genesis = new LogBlock("0");
 		genesis.addTransaction(genesisTransaction);
 		addBlock(genesis);
 		
-		PhotoBlock block1 = new PhotoBlock(genesis.hash);
-		System.out.println("\nAlbumA's balance is: " + albumA.getBalance());
-		System.out.println("\nAlbumA is Attempting to send funds (40) to WalletB...");
-		block1.addTransaction(albumA.sendPhotos(albumB.publicKey, 40f));
+		LogBlock block1 = new LogBlock(genesis.hash);
+		System.out.println("\nWalletA's balance is: " + walletA.getBalance());
+		System.out.println("\nWalletA is Attempting to send funds (40) to WalletB...");
+		block1.addTransaction(walletA.sendFunds(walletB.publicKey, 40f));
 		addBlock(block1);
-		System.out.println("\nAlbumA's balance is: " + albumA.getBalance());
-		System.out.println("AlbumB's balance is: " + albumA.getBalance());
+		System.out.println("\nWalletA's balance is: " + walletA.getBalance());
+		System.out.println("WalletB's balance is: " + walletB.getBalance());
 		
-		PhotoBlock block2 = new PhotoBlock(block1.hash);
-		System.out.println("\nAlbumA Attempting to send more funds (1000) than it has...");
-		block2.addTransaction(albumA.sendPhotos(albumB.publicKey, 1000f));
+		LogBlock block2 = new LogBlock(block1.hash);
+		System.out.println("\nWalletA Attempting to send more funds (1000) than it has...");
+		block2.addTransaction(walletA.sendFunds(walletB.publicKey, 1000f));
 		addBlock(block2);
-		System.out.println("\nAlbumA's balance is: " + albumA.getBalance());
-		System.out.println("AlbumB's balance is: " + albumB.getBalance());
+		System.out.println("\nWalletA's balance is: " + walletA.getBalance());
+		System.out.println("WalletB's balance is: " + walletB.getBalance());
 		
-		Block block3 = new Block(block2.hash);
-		System.out.println("\nAlbumB is Attempting to send funds (20) to WalletA...");
-		block3.addTransaction(albumB.sendPhoto(albumA.publicKey, 20));
-		System.out.println("\nAlbumA's balance is: " + albumA.getBalance());
-		System.out.println("AlbumB balance is: " + albumB.getBalance());
-	
+		LogBlock block3 = new LogBlock(block2.hash);
+		System.out.println("\nWalletB is Attempting to send funds (20) to WalletA...");
+		block3.addTransaction(walletB.sendFunds( walletA.publicKey, 20));
+		System.out.println("\nWalletA's balance is: " + walletA.getBalance());
+		System.out.println("WalletB's balance is: " + walletB.getBalance());
 		isChainValid();
 		
 	}
-	
-	
-		
 	
 	/*
 	public static void main(String[] args) {
@@ -102,9 +94,6 @@ public class AlbumChain {
 		System.out.println(blockchainJson);
 		
 		//blockchain.add(new Block("I am the third block", blockchain.get(blockchain.size()-1).hash));
-		
-		
-		
 		//Block genesisBlock = new Block("I am the alpha block", "0");
 		//System.out.println("Hash for alpha block: " + genesisBlock.hash);
 		
@@ -119,11 +108,11 @@ public class AlbumChain {
 	*/
 	public static Boolean isChainValid() {
 		
-		PhotoBlock cBlock;
-		PhotoBlock pBlock;
+		LogBlock cBlock;
+		LogBlock pBlock;
 		
 		String hashTarget = new String(new char[difficulty]).replace('\0', '0');
-		HashMap<String, PhotoOut> tempUTXOs = new HashMap<String, PhotoOut>();
+		HashMap<String, LogTransactionOutput> tempUTXOs = new HashMap<String, LogTransactionOutput>();
 		tempUTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
 		
 		for (int i = 1; i < blockchain.size(); i++) {
@@ -148,10 +137,10 @@ public class AlbumChain {
 				return false;
 			}
 			
-			PhotoOut tempOutput;
+			LogTransactionOutput tempOutput;
 			for (int j = 0; j < cBlock.transactions.size(); j++) {
 				
-				PhotoTransaction cTransaction = cBlock.transactions.get(j);
+				LogTransaction cTransaction = cBlock.transactions.get(j);
 				if(!cTransaction.verifySignature()){
 				
 					System.out.println("Signature on Transaction (" + j + ") is *invalid");
@@ -164,9 +153,9 @@ public class AlbumChain {
 					return false;
 				}
 				
-				for (PhotoIn input : cTransaction.inputs){
+				for (LogTransactionInput input : cTransaction.inputs){
 					
-					tempOutput = tempUTXOs.get(input.photoOutId);
+					tempOutput = tempUTXOs.get(input.transactionOutputId);
 					
 					if(tempOutput == null) {
 						
@@ -182,11 +171,11 @@ public class AlbumChain {
 					
 					}
 					
-					tempUTXOs.remove(input.photoOutId);
+					tempUTXOs.remove(input.transactionOutputId);
 					
 				}
 				
-				for (PhotoOut output: cTransaction.outputs) {
+				for (LogTransactionOutput output: cTransaction.outputs) {
 					tempUTXOs.put(output.id, output);
 				}
 				
@@ -211,9 +200,8 @@ public class AlbumChain {
 		
 	}
 	
-	public static void addBlock(PhotoBlock newBlock) {
-		newBlock.mineBlock(difficulty);
+	public static void addBlock(LogBlock newBlock) {
+		newBlock.mineLogBlock(difficulty);
 		blockchain.add(newBlock);
 	}
-	
 }

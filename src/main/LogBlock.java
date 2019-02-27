@@ -3,20 +3,18 @@ package main;
 import java.util.ArrayList;
 import java.util.Date;
 
-import album.PhotoTransaction;
 import util.StringUtil;
-import wallet.Transaction;
+import wallet.LogTransaction;
 
-public class PhotoBlock {
-
+public class LogBlock {
+	
 	public String hash;
 	public String previousHash;
 	public String merkleRoot;
-	public ArrayList<PhotoTransaction> transactions = new ArrayList<PhotoTransaction>();
+	public ArrayList<LogTransaction> transactions = new ArrayList<LogTransaction>();
 	//private String data;
 	private long timeStamp;
-	private int nonce;
-	
+	private int nonce;	
 	
 //	public Block(String data, String previousHash) {
 //		
@@ -28,7 +26,7 @@ public class PhotoBlock {
 //	}
 //	
 	
-	public PhotoBlock(String previousHash) {
+	public LogBlock(String previousHash) {
 		
 		this.previousHash = previousHash;
 		this.timeStamp = new Date().getTime();	
@@ -46,9 +44,9 @@ public class PhotoBlock {
 
 	}
 	
-	public void mineBlock(int difficulty) {
+	public void mineLogBlock(int difficulty) {
 		
-		merkleRoot = StringUtil.getPMerkleRoot(transactions);
+		merkleRoot = StringUtil.getLogMerkleRoot(transactions);
 		String target = new String(new char[difficulty]).replace('\0', '0');
 		
 		while (!hash.substring(0, difficulty).equals(target)) {
@@ -58,13 +56,12 @@ public class PhotoBlock {
 			
 		}
 		
-		System.out.println("PhotoBlock Mined!!! : " + hash);
+		System.out.println("Block Mined!!! : " + hash);
 		
 	}
 	
-	public boolean addTransaction(PhotoTransaction transaction) {
-		
-		
+	public boolean addTransaction(LogTransaction transaction) {
+				
 		if(transaction == null) {
 			return false;
 		} 
@@ -81,5 +78,4 @@ public class PhotoBlock {
 		System.out.println("Transaction successfully added to Block");
 		return true;
 	}
-	
 }

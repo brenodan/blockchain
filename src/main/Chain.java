@@ -14,7 +14,6 @@ import com.google.gson.GsonBuilder;
 
 public class Chain {
 
-	
 	public static ArrayList<Block> blockchain = new ArrayList<Block>();
 	public static HashMap<String, TransactionOutput> UTXOs = new HashMap<String, TransactionOutput>();
 	
@@ -35,10 +34,8 @@ public class Chain {
 //		System.out.println("Private and public keys:");
 //		System.out.println(StringUtil.getStringFromKey(walletA.privateKey));
 //		System.out.println(StringUtil.getStringFromKey(walletA.publicKey));
-//		
 //		Transaction transaction = new Transaction(walletA.publicKey, walletB.publicKey, 5, null);
 //		transaction.generateSignature(walletA.privateKey);
-//		
 //		System.out.println("Is signature verified");
 //		System.out.println(transaction.verifySignature());
 	
@@ -80,9 +77,6 @@ public class Chain {
 		
 	}
 	
-	
-		
-	
 	/*
 	public static void main(String[] args) {
 		
@@ -105,9 +99,6 @@ public class Chain {
 		System.out.println(blockchainJson);
 		
 		//blockchain.add(new Block("I am the third block", blockchain.get(blockchain.size()-1).hash));
-		
-		
-		
 		//Block genesisBlock = new Block("I am the alpha block", "0");
 		//System.out.println("Hash for alpha block: " + genesisBlock.hash);
 		
@@ -120,6 +111,8 @@ public class Chain {
 		
 	}
 	*/
+	
+	
 	public static Boolean isChainValid() {
 		
 		Block cBlock;

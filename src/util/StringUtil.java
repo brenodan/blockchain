@@ -4,11 +4,10 @@ import java.security.*;
 import java.util.ArrayList;
 import java.util.Base64;
 
-import album.PhotoTransaction;
+import wallet.LogTransaction;
 import wallet.Transaction;
 
 public class StringUtil {
-
 	
 	public static byte[] applyECDSASig(PrivateKey privateKey, String input) {
 		
@@ -44,6 +43,37 @@ public class StringUtil {
 		}
 	}
 	
+	public static String getLogMerkleRoot(ArrayList<LogTransaction> transactions) {
+		
+		int count = transactions.size();
+		ArrayList<String> previousTreeLayer = new ArrayList<String>();
+		for (LogTransaction transaction: transactions) {
+			previousTreeLayer.add(transaction.transactionId);
+		}
+		
+		ArrayList<String> treeLayer = previousTreeLayer;
+		
+		while(count > 1) {
+			
+			treeLayer = new ArrayList<String>();
+			
+			for(int i = 1; i < previousTreeLayer.size(); i++) {
+				
+				treeLayer.add(applySha256(previousTreeLayer.get(i-1) + previousTreeLayer.get(i)));
+				
+			}
+			
+			count = treeLayer.size();
+			previousTreeLayer = treeLayer;
+			
+		}
+		
+		String merkleRoot = (treeLayer.size() == 1) ? treeLayer.get(0) : "";
+		
+		return merkleRoot;
+		
+	}
+	
 	public static String getMerkleRoot(ArrayList<Transaction> transactions) {
 		
 		int count = transactions.size();
@@ -74,7 +104,7 @@ public class StringUtil {
 		return merkleRoot;
 		
 	}
-	
+	/*
 	public static String getPMerkleRoot(ArrayList<PhotoTransaction> transactions) {
 		
 		int count = transactions.size();
@@ -105,7 +135,7 @@ public class StringUtil {
 		return merkleRoot;
 		
 	}
-	
+	*/
 	public static String applySha256(String input) {
 		
 		try {
